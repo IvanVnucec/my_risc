@@ -1,16 +1,16 @@
 .PHONY = all
-all: main
+all: main.a
 
 .PHONY = run
-run: main
-	./main
+run: main.a
+	./main.a
 
-main: main.o
-	gcc -Wall -Werror main.o -o main
+main.a: main.o
+	gcc -Wall -Werror main.o -o main.a
 
 main.o: main.c
 	gcc -Wall -Werror -c main.c
 
 .PHONY = clean
 clean:
-	rm -f main.o
+	rm -f main.o main.a
