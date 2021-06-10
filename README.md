@@ -1,2 +1,2 @@
 # my_risc
-Simple homemade RISC computer.
+Simple homemade RISC CPU.
