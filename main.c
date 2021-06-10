@@ -52,7 +52,7 @@ uint32_t reg_c;
 int main(void) {
     memory_init();
 
-    for (int i=0; i<15; i++) {
+    for (int i=0; i<30; i++) {
         cpu_tick();
     }
 
@@ -64,12 +64,18 @@ int main(void) {
 
 // write program here
 void memory_init(void) {
-    memory[0] = set_instruction(0, 0, NOP);    // just incr PC
-    memory[1] = set_instruction(0, 0x11, MOV);    // reg_a = 0x11
-    memory[2] = set_instruction(1, 0x22, MOV);    // reg_b = 0x22
-    memory[3] = set_instruction(0, 0, MOV);    // reg_a = 0
-    memory[4] = set_instruction(1, 0, MOV);    // reg_b = 0
-    memory[5] = set_instruction(0, 0, JMP);    // pc = 0
+    memory[0] = set_instruction(0, 0, NOP);     // just incr PC
+    memory[1] = set_instruction(0, 0x11, MOV);  // reg_a = 0x11
+    memory[2] = set_instruction(1, 0x22, MOV);  // reg_b = 0x22
+    memory[3] = set_instruction(0, 2, MOV);     // reg_a = 2
+    memory[4] = set_instruction(1, 0, MOV);     // reg_b = 0
+    memory[5] = set_instruction(1, 1, ADD);     // reg_c = reg_a + 1
+    memory[6] = set_instruction(5, 0, MOV);     // reg_b = reg_c
+    memory[7] = set_instruction(0, 0, ADD);     // reg_c = reg_a + reg_b
+    memory[8] = set_instruction(0, 0, MOV);     // reg_a = 0
+    memory[9] = set_instruction(1, 1, ADD);     // reg_c = reg_a + 1
+    memory[10] = set_instruction(4, 0, MOV);    // reg_a = reg_c
+    memory[11] = set_instruction(0, 9, JMP);    // pc = 9
 }
 
 
@@ -149,7 +155,19 @@ void ldr(void) {
 
 
 void add(void) {
-    reg_c = reg_a + reg_b;
+    switch (get_reg_instr_mode()) {
+    case 0: // reg_c = reg_a + reg_b
+        reg_c = reg_a + reg_b;
+        break;
+
+    case 1: // reg_c = reg_a + value
+        reg_c = reg_a + get_reg_instr_value();
+        break;
+    default:
+        printf("ERROR: Invalid reg_instr mode!\n");
+        while(1);
+    }
+
     reg_pc++;
 }
 
@@ -180,7 +198,6 @@ void orr(void) {
 
 void mov(void) {
     switch (get_reg_instr_mode()) {
-    default:
     case 0: // reg_a = value
         reg_a = get_reg_instr_value();
         reg_pc++;
@@ -219,6 +236,9 @@ void mov(void) {
         reg_b = reg_a;
         reg_pc++;
         break;
+    default:
+        printf("ERROR: Invalid reg_instr mode!\n");
+        while(1);
     }
 }
 
